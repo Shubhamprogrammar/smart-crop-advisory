@@ -1,0 +1,12 @@
+# Core AI service dependencies (installed in Phase 0).
+# ML/CV/RAG-specific packages (torch, transformers, scikit-learn, opencv, OCR,
+# vector DB clients) are added incrementally in the phases that introduce them
+# (Phase 6 crop model, Phase 8 disease model, Phase 12 RAG) to avoid an
+# unnecessarily heavy install before those features exist.
+
+fastapi==0.121.2
+uvicorn[standard]==0.38.0
+pydantic==2.13.5
+pydantic-settings==2.12.0
+python-dotenv==1.1.1
+python-multipart==0.0.20

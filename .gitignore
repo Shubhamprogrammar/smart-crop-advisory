@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables (never ignore *.example templates)
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# Build output
+dist/
+build/
+**/dist/
+**/build/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+venv/
+.venv/
+ai-service/venv/
+ai-service/.venv/
+*.egg-info/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Testing
+coverage/
+
+# Misc
+*.tsbuildinfo
+.turbo/

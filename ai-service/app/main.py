@@ -1,0 +1,27 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.config import get_settings
+from app.routes import health
+
+settings = get_settings()
+
+app = FastAPI(
+    title="Smart Crop Advisory — AI Service",
+    description="FastAPI service for crop recommendation, disease detection, disease-risk prediction, OCR, chat, and RAG embeddings.",
+    version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(health.router)
+
+# AI capability routers are included here as each phase is built, e.g.:
+# app.include_router(crop_recommendation.router, prefix="/ai/crop-recommendation")
+# app.include_router(disease_detection.router, prefix="/ai/disease-detection")

@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  /* Neutral surface */
+  --background: #faf9f6;
+  --foreground: #1f2a1d;
+  --muted: #f0eee6;
+  --border: #e3ded2;
+
+  /* Brand */
+  --color-primary: #3f6b4a; /* sage/leaf green */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #c98a2c; /* warm gold/amber */
+  --color-secondary-foreground: #ffffff;
+
+  /* Semantic */
+  --color-success: #3f8f4f;
+  --color-warning: #d9a441;
+  --color-danger: #c0392b;
+  --color-info: #3e7cb1;
+
+  /* Shape */
+  --radius-card: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  --radius-card: var(--radius-card);
+
+  --font-sans: var(--font-inter);
+  --font-devanagari: var(--font-noto-devanagari);
+  --font-gujarati: var(--font-noto-gujarati);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), var(--font-devanagari), var(--font-gujarati),
+    ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+}
