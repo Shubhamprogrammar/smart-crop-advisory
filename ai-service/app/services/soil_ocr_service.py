@@ -57,15 +57,30 @@ _FIELD_PATTERNS: dict[str, list[str]] = {
     "moisture": [rf"\bMoisture\b[^0-9\-]{{0,15}}{_NUMBER}"],
 }
 
+# Physically plausible ranges. A number that lands outside its field's range
+# is almost certainly an OCR misread (e.g. a lost decimal point), so it's
+# discarded rather than reported as a confident-looking wrong value.
+_PLAUSIBLE_RANGE: dict[str, tuple[float, float]] = {
+    "nitrogen": (0, 2000),  # kg/ha
+    "phosphorus": (0, 500),  # kg/ha
+    "potassium": (0, 1000),  # kg/ha
+    "ph": (0, 14),
+    "organic_carbon": (0, 10),  # %
+    "moisture": (0, 100),  # %
+}
+
 
 def _extract_field(text: str, field_name: str) -> float | None:
+    low, high = _PLAUSIBLE_RANGE[field_name]
     for pattern in _FIELD_PATTERNS[field_name]:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
             try:
-                return float(match.group(1))
+                value = float(match.group(1))
             except ValueError:
                 continue
+            if low <= value <= high:
+                return value
     return None
 
 
@@ -94,6 +109,13 @@ def run_ocr(image_bytes: bytes) -> SoilOcrResult:
 
     extracted = parse_soil_values(raw_text)
     found = extracted.found_count()
-    confidence = "medium" if found >= 3 else ("low" if found >= 1 else "none")
+    if found >= 5:
+        confidence = "high"
+    elif found >= 3:
+        confidence = "medium"
+    elif found >= 1:
+        confidence = "low"
+    else:
+        confidence = "none"
 
     return SoilOcrResult(raw_text=raw_text.strip(), extracted=extracted, confidence=confidence)

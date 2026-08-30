@@ -22,7 +22,7 @@ export interface SoilOcrExtracted {
 export interface SoilOcrResponse {
   rawText: string;
   extracted: SoilOcrExtracted;
-  confidence: "none" | "low" | "medium";
+  confidence: "none" | "low" | "medium" | "high";
   modelVersion: string;
 }
 
