@@ -58,7 +58,13 @@ export type SupportedDiseaseCrop = (typeof SUPPORTED_DISEASE_CROPS)[number];
 export const SEASONS = ["kharif", "rabi", "zaid", "perennial"] as const;
 export type Season = (typeof SEASONS)[number];
 
-export const DATA_SOURCE = ["real_data", "ai_prediction"] as const;
+// "simulated_demo" exists because Phase 14 (market intelligence) has no
+// connected real market-price API yet (would need a data.gov.in Agmarknet
+// key) — the user explicitly asked for simulated data to demo the feature
+// meanwhile. Neither "real_data" nor "ai_prediction" would honestly
+// describe that data, and the spec is explicit: "never present fabricated
+// prices as real data" / "clearly label seed/demo data" (§23, §N).
+export const DATA_SOURCE = ["real_data", "ai_prediction", "simulated_demo"] as const;
 export type DataSource = (typeof DATA_SOURCE)[number];
 
 export const CALENDAR_TASK_TYPES = [

@@ -12,6 +12,7 @@ import advisoryRoutes from "./advisory.routes";
 import chatRoutes from "./chat.routes";
 import knowledgeRoutes from "./knowledge.routes";
 import profitRoutes from "./profit.routes";
+import marketRoutes from "./market.routes";
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.use("/advisories", advisoryRoutes);
 router.use("/chat", chatRoutes);
 router.use("/knowledge", knowledgeRoutes);
 router.use("/profit", profitRoutes);
+router.use("/market", marketRoutes);
 
 // Additional feature routers are mounted here as each phase is built.
 
