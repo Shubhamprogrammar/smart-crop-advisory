@@ -1,7 +1,7 @@
 import { Schema, model, Document, Types } from "mongoose";
 import { LANGUAGES, Language } from "../constants/enums";
 
-const KNOWLEDGE_CATEGORIES = [
+export const KNOWLEDGE_CATEGORIES = [
   "crop_cultivation",
   "disease_management",
   "fertilizer",
@@ -47,8 +47,10 @@ const knowledgeDocumentSchema = new Schema<IKnowledgeDocument>(
   { timestamps: true }
 );
 
-// Chunk-level text + embeddings are introduced in Phase 12 (RAG) as their own
-// collection so each chunk can carry its own Atlas Vector Search index.
+// Chunk-level text + embeddings (Phase 12 RAG) live in Qdrant, not MongoDB —
+// see docs/blueprint.md and ai-service/app/rag/vector_store.py for why.
+// This document is the metadata/source-of-truth record; Qdrant points
+// reference it by this document's _id.
 
 export const KnowledgeDocument = model<IKnowledgeDocument>(
   "KnowledgeDocument",

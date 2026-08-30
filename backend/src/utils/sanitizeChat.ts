@@ -19,6 +19,7 @@ export function sanitizeChatMessage(message: IChatMessage) {
     sender: message.sender,
     content: message.content,
     language: message.language,
+    sources: message.ragSources?.map((s) => ({ documentId: s.documentId.toString(), title: s.title })),
     createdAt: message.createdAt,
   };
 }

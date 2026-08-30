@@ -1,18 +1,23 @@
 """
-AI farmer assistant.
+AI farmer assistant, now with RAG (Phase 12).
 
-Per the spec (§12, §K, §28): the LLM here explains/adapts in
-farmer-friendly language — it does not independently decide agricultural
-actions. The system prompt instructs it to ground answers in the
-structured farm context Node provides (soil/weather/crop/disease data
-already computed by the app's own rules/ML in earlier phases), never
-invent pesticide dosages or fabricate data not given to it, state
-uncertainty plainly, and point to a local expert for serious cases.
+Per the spec (§12, §K, §15, §28): the LLM explains/adapts in
+farmer-friendly language grounded in real data — it does not
+independently decide agricultural actions or invent facts. Two kinds of
+grounding feed the prompt: (1) structured farm context Node provides
+(soil/weather/crop/disease data from earlier phases) and (2) retrieved
+knowledge-base chunks (Phase 12's RAG pipeline: question -> embedding ->
+vector search -> top-K chunks). The system prompt instructs the model to
+use only what it's given, cite sources naturally, never invent pesticide
+dosages or market prices, state uncertainty plainly, and defer to a local
+expert for serious cases.
 
 Uses Hugging Face Inference Providers (the modern hosted-inference path,
 requires HF_API_TOKEN) rather than a locally-run LLM: unlike Phase 8's
 vision model, a small CPU-run open LLM would very likely produce poor
 quality in Hindi/Marathi/Gujarati, which this feature explicitly needs.
+Embeddings for RAG run locally instead (see rag/embeddings.py) — that
+choice is independent of this one and unaffected by HF inference quota.
 
 Per-language model routing (live-verified against real Hindi/Marathi/
 Gujarati questions, not assumed):
@@ -27,15 +32,13 @@ Gujarati questions, not assumed):
   was exhausted mid-testing -> 402 Payment Required on both models) and
   defaults to the Hindi/Marathi model as the closest verified proxy;
   re-verify once quota is available.
-- Chosen models are not gated and were reachable via the free tier
-  short of the credit limit; no local fallback exists here (see the
-  module docstring above for why).
 """
 
 import logging
 from dataclasses import dataclass
 
 from app.config import get_settings
+from app.rag.retrieval import RetrievedChunk, retrieve_context
 
 logger = logging.getLogger(__name__)
 
@@ -61,14 +64,17 @@ SYSTEM_PROMPT_TEMPLATE = """You are a helpful, friendly assistant for small and 
 Rules you must always follow:
 - Respond in {language_name}, using simple, everyday words a farmer would use — avoid technical jargon.
 - Keep answers short and practical (a few sentences, or a short list of steps).
-- Ground your answer in the farm context given below when it's relevant to the question. Do not contradict it.
+- Ground your answer in the farm context and knowledge base excerpts given below when relevant. Do not contradict them.
+- Only state agricultural facts that are supported by the farm context, the knowledge base excerpts, or well-established general knowledge — if you're unsure, say so plainly instead of guessing.
 - Never invent specific pesticide or fertilizer dosages/quantities — if asked, give general guidance and recommend consulting a local agriculture expert or the product label for exact amounts.
 - Never state a specific market price unless it is given to you in the context.
-- If you are not confident about something, say so plainly instead of guessing.
 - For serious or urgent-sounding problems (rapid crop death, suspected serious disease outbreak), recommend the farmer consult a local agriculture expert.
 
 Farm context (may be partial or empty if not available):
 {context}
+
+Knowledge base excerpts (may be empty if nothing relevant was found — in that case, rely on general knowledge and say so if you're uncertain):
+{knowledge_context}
 """
 
 
@@ -86,6 +92,7 @@ class ChatMessage:
 class ChatReply:
     answer: str
     modelVersion: str
+    sources: list[RetrievedChunk]
 
 
 CHAT_TIMEOUT_SECONDS = 45
@@ -94,12 +101,19 @@ CHAT_TIMEOUT_SECONDS = 45
 def _client_and_model(language: str):
     settings = get_settings()
     if not settings.hf_api_token:
+        logger.warning("Chat request received but HF_API_TOKEN is not configured")
         raise ChatUnavailableError("HF_API_TOKEN is not configured")
 
     from huggingface_hub import InferenceClient
 
     model_id = MODEL_BY_LANGUAGE.get(language, settings.chat_model_id)
     return InferenceClient(api_key=settings.hf_api_token, timeout=CHAT_TIMEOUT_SECONDS), model_id
+
+
+def _format_knowledge_context(chunks: list[RetrievedChunk]) -> str:
+    if not chunks:
+        return "(no relevant knowledge base content found)"
+    return "\n\n".join(f"[Source: {c.title}]\n{c.chunk_text}" for c in chunks)
 
 
 def get_reply(
@@ -110,10 +124,20 @@ def get_reply(
 ) -> ChatReply:
     client, model_id = _client_and_model(language)
 
+    try:
+        retrieved = retrieve_context(question)
+    except Exception as exc:
+        # RAG is an enhancement to chat, not a hard dependency -- a vector
+        # store outage shouldn't take down the whole assistant, only lose
+        # the knowledge-base grounding for this one reply.
+        logger.warning("RAG retrieval failed, continuing without it: %s", exc)
+        retrieved = []
+
     language_name = LANGUAGE_NAMES.get(language, "English")
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         language_name=language_name,
         context=context.strip() if context.strip() else "(no farm context available)",
+        knowledge_context=_format_knowledge_context(retrieved),
     )
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -133,4 +157,4 @@ def get_reply(
         raise ChatUnavailableError(f"LLM call failed: {exc}") from exc
 
     answer = completion.choices[0].message.content
-    return ChatReply(answer=answer, modelVersion=model_id)
+    return ChatReply(answer=answer, modelVersion=model_id, sources=retrieved)

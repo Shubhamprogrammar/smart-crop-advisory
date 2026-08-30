@@ -171,9 +171,17 @@ export interface ChatRequest {
   history: ChatHistoryMessage[];
 }
 
+export interface ChatSource {
+  documentId: string;
+  title: string;
+  chunkText: string;
+  score: number;
+}
+
 export interface ChatResponse {
   answer: string;
   modelVersion: string;
+  sources: ChatSource[];
 }
 
 export async function requestChatReply(input: ChatRequest): Promise<AiResult<ChatResponse>> {
@@ -184,5 +192,39 @@ export async function requestChatReply(input: ChatRequest): Promise<AiResult<Cha
     return { ok: true, data };
   } catch (err) {
     return handleAiError(err, "chat");
+  }
+}
+
+export interface IngestDocumentRequest {
+  documentId: string;
+  title: string;
+  category: string;
+  language: string;
+  text: string;
+}
+
+export interface IngestDocumentResponse {
+  chunkCount: number;
+}
+
+export async function requestIngestDocument(
+  input: IngestDocumentRequest
+): Promise<AiResult<IngestDocumentResponse>> {
+  try {
+    const { data } = await aiClient.post<IngestDocumentResponse>("/ai/embeddings", input, {
+      timeout: 60000,
+    });
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "embeddings-ingest");
+  }
+}
+
+export async function requestDeleteEmbeddings(documentId: string): Promise<AiResult<{ success: boolean }>> {
+  try {
+    const { data } = await aiClient.delete<{ success: boolean }>(`/ai/embeddings/${documentId}`);
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "embeddings-delete");
   }
 }

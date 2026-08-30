@@ -80,6 +80,13 @@ export async function sendMessage(
     sender: "assistant",
     content: answer,
     contextSnapshot: context ? { context } : undefined,
+    ragSources: aiResult.ok
+      ? aiResult.data.sources.map((s) => ({
+          documentId: s.documentId,
+          title: s.title,
+          chunkText: s.chunkText,
+        }))
+      : undefined,
     language: chat.language,
   });
 

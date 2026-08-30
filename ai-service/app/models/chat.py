@@ -13,6 +13,14 @@ class ChatRequest(BaseModel):
     history: list[ChatHistoryMessage] = []
 
 
+class ChatSourceSchema(BaseModel):
+    documentId: str
+    title: str
+    chunkText: str
+    score: float
+
+
 class ChatResponse(BaseModel):
     answer: str
     modelVersion: str
+    sources: list[ChatSourceSchema] = []

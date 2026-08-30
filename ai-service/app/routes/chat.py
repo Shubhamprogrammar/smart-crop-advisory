@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.models.chat import ChatRequest, ChatResponse
+from app.models.chat import ChatRequest, ChatResponse, ChatSourceSchema
 from app.services.chat_service import ChatMessage, ChatUnavailableError, get_reply
 
 router = APIRouter()
@@ -24,4 +24,11 @@ async def chat(payload: ChatRequest):
             detail="The AI assistant is temporarily unavailable. Please try again later.",
         )
 
-    return ChatResponse(answer=reply.answer, modelVersion=reply.modelVersion)
+    return ChatResponse(
+        answer=reply.answer,
+        modelVersion=reply.modelVersion,
+        sources=[
+            ChatSourceSchema(documentId=s.document_id, title=s.title, chunkText=s.chunk_text, score=s.score)
+            for s in reply.sources
+        ],
+    )
