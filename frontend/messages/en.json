@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "myFarms": "My Farms",
+    "soilHealth": "Soil Health",
+    "cropRecommendation": "Crop Recommendation",
+    "myCrops": "My Crops",
+    "diseaseDetection": "Disease Detection",
+    "weather": "Weather",
+    "irrigation": "Irrigation",
+    "market": "Market",
+    "profitability": "Profitability",
+    "cropCalendar": "Crop Calendar",
+    "aiAssistant": "AI Assistant",
+    "notifications": "Notifications",
+    "askExpert": "Ask Expert",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Smart Crop Advisory",
+    "subtitle": "AI-powered crop advisory for small and marginal farmers",
+    "backendChecking": "Checking backend connection…",
+    "backendUnavailable": "Backend unavailable — start the API on port 5000.",
+    "backendConnected": "Backend connected",
+    "status": "status"
+  },
+  "common": {
+    "language": "Language"
+  }
+}

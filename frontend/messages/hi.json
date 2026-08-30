@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "myFarms": "मेरे खेत",
+    "soilHealth": "मिट्टी स्वास्थ्य",
+    "cropRecommendation": "फसल सुझाव",
+    "myCrops": "मेरी फसलें",
+    "diseaseDetection": "रोग पहचान",
+    "weather": "मौसम",
+    "irrigation": "सिंचाई",
+    "market": "बाज़ार",
+    "profitability": "लाभप्रदता",
+    "cropCalendar": "फसल कैलेंडर",
+    "aiAssistant": "एआई सहायक",
+    "notifications": "सूचनाएं",
+    "askExpert": "विशेषज्ञ से पूछें",
+    "profile": "प्रोफ़ाइल"
+  },
+  "home": {
+    "title": "स्मार्ट फसल सलाहकार",
+    "subtitle": "छोटे और सीमांत किसानों के लिए एआई-संचालित फसल सलाह",
+    "backendChecking": "बैकएंड कनेक्शन जाँचा जा रहा है…",
+    "backendUnavailable": "बैकएंड उपलब्ध नहीं है — पोर्ट 5000 पर एपीआई शुरू करें।",
+    "backendConnected": "बैकएंड कनेक्ट है",
+    "status": "स्थिति"
+  },
+  "common": {
+    "language": "भाषा"
+  }
+}

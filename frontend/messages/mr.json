@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "dashboard": "डॅशबोर्ड",
+    "myFarms": "माझी शेते",
+    "soilHealth": "माती आरोग्य",
+    "cropRecommendation": "पीक शिफारस",
+    "myCrops": "माझी पिके",
+    "diseaseDetection": "रोग ओळख",
+    "weather": "हवामान",
+    "irrigation": "सिंचन",
+    "market": "बाजार",
+    "profitability": "नफाक्षमता",
+    "cropCalendar": "पीक दिनदर्शिका",
+    "aiAssistant": "एआय सहाय्यक",
+    "notifications": "सूचना",
+    "askExpert": "तज्ज्ञांना विचारा",
+    "profile": "प्रोफाइल"
+  },
+  "home": {
+    "title": "स्मार्ट पीक सल्लागार",
+    "subtitle": "अल्प व सीमांत शेतकऱ्यांसाठी एआय-आधारित पीक सल्ला",
+    "backendChecking": "बॅकएंड जोडणी तपासत आहे…",
+    "backendUnavailable": "बॅकएंड उपलब्ध नाही — पोर्ट 5000 वर एपीआय सुरू करा.",
+    "backendConnected": "बॅकएंड जोडलेले आहे",
+    "status": "स्थिती"
+  },
+  "common": {
+    "language": "भाषा"
+  }
+}

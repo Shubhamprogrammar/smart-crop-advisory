@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "dashboard": "ડેશબોર્ડ",
+    "myFarms": "મારા ખેતરો",
+    "soilHealth": "જમીન આરોગ્ય",
+    "cropRecommendation": "પાક ભલામણ",
+    "myCrops": "મારા પાકો",
+    "diseaseDetection": "રોગ ઓળખ",
+    "weather": "હવામાન",
+    "irrigation": "સિંચાઈ",
+    "market": "બજાર",
+    "profitability": "નફાકારકતા",
+    "cropCalendar": "પાક કેલેન્ડર",
+    "aiAssistant": "AI સહાયક",
+    "notifications": "સૂચનાઓ",
+    "askExpert": "નિષ્ણાતને પૂછો",
+    "profile": "પ્રોફાઇલ"
+  },
+  "home": {
+    "title": "સ્માર્ટ પાક સલાહકાર",
+    "subtitle": "નાના અને સીમાંત ખેડૂતો માટે AI-સંચાલિત પાક સલાહ",
+    "backendChecking": "બેકએન્ડ જોડાણ તપાસી રહ્યા છીએ…",
+    "backendUnavailable": "બેકએન્ડ ઉપલબ્ધ નથી — પોર્ટ 5000 પર API શરૂ કરો.",
+    "backendConnected": "બેકએન્ડ જોડાયેલ છે",
+    "status": "સ્થિતિ"
+  },
+  "common": {
+    "language": "ભાષા"
+  }
+}
