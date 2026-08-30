@@ -51,3 +51,6 @@ export type { IExpertCase } from "./ExpertCase.model";
 
 export { ExpertResponse } from "./ExpertResponse.model";
 export type { IExpertResponse } from "./ExpertResponse.model";
+
+export { AdvisoryRuleConfig } from "./AdvisoryRuleConfig.model";
+export type { IAdvisoryRuleConfig } from "./AdvisoryRuleConfig.model";

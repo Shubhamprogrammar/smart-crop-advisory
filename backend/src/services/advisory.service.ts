@@ -8,6 +8,7 @@ import { getLatestByFarm } from "./soil.service";
 import { getWeatherForFarm, WeatherResult } from "./weather.service";
 import { getLatestRisk } from "./diseaseRisk.service";
 import { AdvisoryContext, runAllRules } from "./advisoryRules";
+import { getRuleThresholds } from "./advisoryRuleConfig.service";
 import { createNotification } from "./notification.service";
 
 const RECENT_DETECTION_WINDOW_DAYS = 7;
@@ -41,7 +42,8 @@ async function buildContext(farmId: string, ownerId: string): Promise<AdvisoryCo
 
 export async function generateAdvisories(farmId: string, ownerId: string): Promise<IAdvisory[]> {
   const ctx = await buildContext(farmId, ownerId);
-  const candidates = runAllRules(ctx);
+  const thresholds = await getRuleThresholds();
+  const candidates = runAllRules(ctx, thresholds);
 
   const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000);
   const results: IAdvisory[] = [];

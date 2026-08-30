@@ -51,21 +51,39 @@ function inDays(days: number): Date {
 }
 
 // --- Weather rules -----------------------------------------------------
+//
+// Thresholds are admin-configurable (Phase 19, spec §16) via
+// AdvisoryRuleConfig. DEFAULT_THRESHOLDS is the fallback used whenever no
+// config document exists yet, so this engine never depends on the DB call
+// having succeeded.
 
-const HEAVY_RAIN_PROBABILITY = 70;
-const HEAVY_RAIN_MM = 10;
-const STRONG_WIND_KMH = 25;
-const HEAT_STRESS_C = 40;
-const COLD_STRESS_C = 5;
+export interface RuleThresholds {
+  heavyRainProbability: number;
+  heavyRainMm: number;
+  strongWindKmh: number;
+  heatStressC: number;
+  coldStressC: number;
+}
 
-export function heavyRainRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
+export const DEFAULT_THRESHOLDS: RuleThresholds = {
+  heavyRainProbability: 70,
+  heavyRainMm: 10,
+  strongWindKmh: 25,
+  heatStressC: 40,
+  coldStressC: 5,
+};
+
+export function heavyRainRule(
+  ctx: AdvisoryContext,
+  thresholds: RuleThresholds = DEFAULT_THRESHOLDS
+): AdvisoryCandidate | null {
   const weather = ctx.weather?.snapshot;
   if (!weather) return null;
 
-  const todayHeavy = weather.current.rainProbability >= HEAVY_RAIN_PROBABILITY;
+  const todayHeavy = weather.current.rainProbability >= thresholds.heavyRainProbability;
   const tomorrowHeavy =
-    (weather.forecast[1]?.rainProbability ?? 0) >= HEAVY_RAIN_PROBABILITY &&
-    (weather.forecast[1]?.rainfall ?? 0) >= HEAVY_RAIN_MM;
+    (weather.forecast[1]?.rainProbability ?? 0) >= thresholds.heavyRainProbability &&
+    (weather.forecast[1]?.rainfall ?? 0) >= thresholds.heavyRainMm;
 
   if (!todayHeavy && !tomorrowHeavy) return null;
 
@@ -87,9 +105,12 @@ export function heavyRainRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
   };
 }
 
-export function strongWindRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
+export function strongWindRule(
+  ctx: AdvisoryContext,
+  thresholds: RuleThresholds = DEFAULT_THRESHOLDS
+): AdvisoryCandidate | null {
   const current = ctx.weather?.snapshot.current;
-  if (!current || current.windSpeed < STRONG_WIND_KMH) return null;
+  if (!current || current.windSpeed < thresholds.strongWindKmh) return null;
 
   return {
     type: "pest",
@@ -101,11 +122,14 @@ export function strongWindRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
   };
 }
 
-export function extremeTemperatureRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
+export function extremeTemperatureRule(
+  ctx: AdvisoryContext,
+  thresholds: RuleThresholds = DEFAULT_THRESHOLDS
+): AdvisoryCandidate | null {
   const current = ctx.weather?.snapshot.current;
   if (!current) return null;
 
-  if (current.temperature >= HEAT_STRESS_C) {
+  if (current.temperature >= thresholds.heatStressC) {
     return {
       type: "weather",
       priority: "high",
@@ -116,7 +140,7 @@ export function extremeTemperatureRule(ctx: AdvisoryContext): AdvisoryCandidate 
     };
   }
 
-  if (current.temperature <= COLD_STRESS_C) {
+  if (current.temperature <= thresholds.coldStressC) {
     return {
       type: "weather",
       priority: "high",
@@ -213,11 +237,19 @@ export function recentDiseaseDetectionRule(ctx: AdvisoryContext): AdvisoryCandid
   }));
 }
 
-export function runAllRules(ctx: AdvisoryContext): AdvisoryCandidate[] {
-  const singleRules = [heavyRainRule, strongWindRule, extremeTemperatureRule, soilHealthRule, irrigationNeedRule, diseaseRiskRule];
+export function runAllRules(
+  ctx: AdvisoryContext,
+  thresholds: RuleThresholds = DEFAULT_THRESHOLDS
+): AdvisoryCandidate[] {
+  const weatherRules = [heavyRainRule, strongWindRule, extremeTemperatureRule];
+  const otherRules = [soilHealthRule, irrigationNeedRule, diseaseRiskRule];
 
   const results: AdvisoryCandidate[] = [];
-  for (const rule of singleRules) {
+  for (const rule of weatherRules) {
+    const candidate = rule(ctx, thresholds);
+    if (candidate) results.push(candidate);
+  }
+  for (const rule of otherRules) {
     const candidate = rule(ctx);
     if (candidate) results.push(candidate);
   }
