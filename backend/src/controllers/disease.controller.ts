@@ -35,3 +35,20 @@ export async function getDetection(req: Request, res: Response) {
     data: { detection: sanitizeDiseaseDetection(detection) },
   });
 }
+
+export async function getDetectionImage(req: Request, res: Response) {
+  const { buffer, contentType } = await diseaseService.getImageForUser(
+    req.params.id,
+    req.user!.id,
+    req.user!.role
+  );
+  res.set("Content-Type", contentType);
+  res.set("Cache-Control", "private, max-age=300");
+  // Helmet's default same-origin CORP would otherwise block the
+  // frontend's cross-origin (different port in dev) blob fetch from
+  // reading this response — CORS already restricts the caller to
+  // env.CORS_ORIGIN and the route itself checks auth/ownership, so
+  // loosening just this response is safe.
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.send(buffer);
+}

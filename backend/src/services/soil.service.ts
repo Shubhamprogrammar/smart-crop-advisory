@@ -1,8 +1,9 @@
 import { SoilReport, ISoilReport } from "../models/SoilReport.model";
+import { Role } from "../constants/enums";
 import { ApiError } from "../utils/ApiError";
 import { computeSoilHealth } from "../utils/soilHealth";
 import { getOwnedFarmOrThrow } from "./farm.service";
-import { uploadImageBuffer } from "./cloudinary.service";
+import { uploadImageBuffer, fetchPrivateImage } from "./cloudinary.service";
 import { requestSoilOcr } from "./aiClient.service";
 import { ManualSoilEntryInput } from "../validators/soil.validator";
 
@@ -37,7 +38,7 @@ export async function createFromUpload(
 ): Promise<ISoilReport> {
   await getOwnedFarmOrThrow(farmId, ownerId);
 
-  const { url } = await uploadImageBuffer(file.buffer, "soil-reports");
+  const { publicId, format } = await uploadImageBuffer(file.buffer, "soil-reports");
 
   const ocrResult = await requestSoilOcr(file.buffer, file.originalname, file.mimetype);
 
@@ -45,7 +46,8 @@ export async function createFromUpload(
     return SoilReport.create({
       farm: farmId,
       source: "upload_ocr",
-      reportImageUrl: url,
+      reportImagePublicId: publicId,
+      reportImageFormat: format,
       interpretation:
         "Soil report image saved, but automatic text extraction was unavailable. Please enter values manually.",
       fertilizerRecommendation: "Add soil readings to receive a fertilizer recommendation.",
@@ -72,7 +74,8 @@ export async function createFromUpload(
   return SoilReport.create({
     farm: farmId,
     source: "upload_ocr",
-    reportImageUrl: url,
+    reportImagePublicId: publicId,
+    reportImageFormat: format,
     ...soilInput,
     healthScore,
     interpretation: interpretation + ocrNote,
@@ -99,4 +102,21 @@ export async function getReportById(reportId: string, ownerId: string): Promise<
 
   await getOwnedFarmOrThrow(report.farm.toString(), ownerId);
   return report;
+}
+
+export async function getReportImageForUser(
+  reportId: string,
+  userId: string,
+  role: Role
+): Promise<{ buffer: Buffer; contentType: string }> {
+  const report = await SoilReport.findById(reportId);
+  if (!report || !report.reportImagePublicId || !report.reportImageFormat) {
+    throw ApiError.notFound("Soil report image not found");
+  }
+
+  if (role !== "admin") {
+    await getOwnedFarmOrThrow(report.farm.toString(), userId);
+  }
+
+  return fetchPrivateImage(report.reportImagePublicId, report.reportImageFormat);
 }

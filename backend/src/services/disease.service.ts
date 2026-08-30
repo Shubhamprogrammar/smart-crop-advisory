@@ -1,8 +1,10 @@
 import { DiseaseDetection, IDiseaseDetection } from "../models/DiseaseDetection.model";
 import { CropCycle } from "../models/CropCycle.model";
+import { ExpertCase } from "../models/ExpertCase.model";
+import { Role } from "../constants/enums";
 import { ApiError } from "../utils/ApiError";
 import { getOwnedFarmOrThrow } from "./farm.service";
-import { uploadImageBuffer } from "./cloudinary.service";
+import { uploadImageBuffer, fetchPrivateImage } from "./cloudinary.service";
 import { requestDiseaseDetection } from "./aiClient.service";
 import { SUPPORTED_DISEASE_CROPS, SupportedDiseaseCrop } from "../constants/enums";
 import { DetectDiseaseInput } from "../validators/disease.validator";
@@ -43,7 +45,7 @@ export async function detectDisease(
 
   const { cropType, cropCycleId } = await resolveCropType(farmId, input.cropType);
 
-  const { url } = await uploadImageBuffer(file.buffer, "disease-detections");
+  const { publicId, format } = await uploadImageBuffer(file.buffer, "disease-detections");
 
   const aiResult = await requestDiseaseDetection(file.buffer, file.originalname, file.mimetype);
 
@@ -57,7 +59,8 @@ export async function detectDisease(
     cropCycle: cropCycleId,
     farm: farmId,
     farmer: ownerId,
-    imageUrl: url,
+    imagePublicId: publicId,
+    imageFormat: format,
     cropType: result.cropType ?? cropType,
     predictedDisease: result.diseaseName ?? undefined,
     confidence: result.confidence,
@@ -84,4 +87,41 @@ export async function getById(id: string, ownerId: string): Promise<IDiseaseDete
   }
   await getOwnedFarmOrThrow(detection.farm.toString(), ownerId);
   return detection;
+}
+
+/**
+ * An expert never owns the farm a detection belongs to — their access is
+ * entirely mediated through an ExpertCase that references this detection
+ * (mirrors expert.service.ts's assertCaseAccess: assigned to them, or
+ * still open for anyone to pick up).
+ */
+async function expertHasCaseAccess(detectionId: string, expertId: string): Promise<boolean> {
+  const found = await ExpertCase.exists({
+    diseaseDetection: detectionId,
+    $or: [{ expert: expertId }, { status: "open" }],
+  });
+  return Boolean(found);
+}
+
+export async function getImageForUser(
+  detectionId: string,
+  userId: string,
+  role: Role
+): Promise<{ buffer: Buffer; contentType: string }> {
+  const detection = await DiseaseDetection.findById(detectionId);
+  if (!detection) {
+    throw ApiError.notFound("Disease detection not found");
+  }
+
+  const isOwner = detection.farmer.toString() === userId;
+  const allowed =
+    role === "admin" ||
+    (role === "farmer" && isOwner) ||
+    (role === "expert" && (await expertHasCaseAccess(detectionId, userId)));
+
+  if (!allowed) {
+    throw ApiError.notFound("Disease detection not found");
+  }
+
+  return fetchPrivateImage(detection.imagePublicId, detection.imageFormat);
 }

@@ -3,6 +3,7 @@ import * as knowledgeController from "../controllers/knowledge.controller";
 import { requireAuth } from "../middlewares/auth.middleware";
 import { requireRole } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validate";
+import { aiLimiter } from "../middlewares/rateLimiter";
 import { catchAsync } from "../utils/catchAsync";
 import {
   createKnowledgeDocumentSchema,
@@ -14,7 +15,12 @@ const router = Router();
 router.use(requireAuth);
 router.use(requireRole("admin"));
 
-router.post("/", validate(createKnowledgeDocumentSchema), catchAsync(knowledgeController.createDocument));
+router.post(
+  "/",
+  aiLimiter,
+  validate(createKnowledgeDocumentSchema),
+  catchAsync(knowledgeController.createDocument)
+);
 router.get("/", catchAsync(knowledgeController.listDocuments));
 router.delete(
   "/:id",

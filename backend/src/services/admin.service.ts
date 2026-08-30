@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { escapeRegex } from "../utils/escapeRegex";
 import { User, IUser } from "../models/User.model";
 import { Farm } from "../models/Farm.model";
 import { CropCycle } from "../models/CropCycle.model";
@@ -175,7 +176,7 @@ export async function listUsers(query: ListUsersQuery) {
   if (query.role) filter.role = query.role;
   if (query.isActive !== undefined) filter.isActive = query.isActive;
   if (query.search) {
-    const re = new RegExp(query.search.trim(), "i");
+    const re = new RegExp(escapeRegex(query.search.trim()), "i");
     filter.$or = [{ name: re }, { email: re }, { phone: re }];
   }
 
@@ -329,7 +330,7 @@ export function sanitizeDiseaseDetectionAdmin(detection: IDiseaseDetection) {
     farmer: farmerPopulated
       ? { id: farmer._id.toString(), name: farmer.name, phone: farmer.phone }
       : detection.farmer.toString(),
-    imageUrl: detection.imageUrl,
+    imageUrl: `/api/diseases/detection/${detection._id.toString()}/image`,
     cropType: detection.cropType,
     predictedDisease: detection.predictedDisease,
     confidence: detection.confidence,

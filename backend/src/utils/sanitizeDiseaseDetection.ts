@@ -5,7 +5,7 @@ export function sanitizeDiseaseDetection(detection: IDiseaseDetection) {
     id: detection._id.toString(),
     cropCycle: detection.cropCycle?.toString(),
     farm: detection.farm.toString(),
-    imageUrl: detection.imageUrl,
+    imageUrl: `/api/diseases/detection/${detection._id.toString()}/image`,
     cropType: detection.cropType,
     predictedDisease: detection.predictedDisease,
     confidence: detection.confidence,

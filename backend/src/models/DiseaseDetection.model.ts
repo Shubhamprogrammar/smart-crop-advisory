@@ -6,7 +6,8 @@ export interface IDiseaseDetection extends Document {
   cropCycle?: Types.ObjectId;
   farm: Types.ObjectId;
   farmer: Types.ObjectId;
-  imageUrl: string;
+  imagePublicId: string;
+  imageFormat: string;
   cropType: string;
   predictedDisease?: string;
   confidence?: number;
@@ -28,7 +29,14 @@ const diseaseDetectionSchema = new Schema<IDiseaseDetection>(
     cropCycle: { type: Schema.Types.ObjectId, ref: "CropCycle", index: true },
     farm: { type: Schema.Types.ObjectId, ref: "Farm", required: true, index: true },
     farmer: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    imageUrl: { type: String, required: true },
+    // Not a served URL — Cloudinary type:"private" storage (see
+    // cloudinary.service.ts). Access always goes through
+    // GET /api/diseases/detection/:id/image, which checks ownership/case
+    // access on every request and mints a short-lived signed fetch, per
+    // spec §9 "Prevent unauthorized image access" — a plain public
+    // secure_url would otherwise work forever for anyone who obtained it.
+    imagePublicId: { type: String, required: true },
+    imageFormat: { type: String, required: true },
     cropType: { type: String, required: true, enum: SUPPORTED_DISEASE_CROPS },
     predictedDisease: { type: String },
     confidence: { type: Number, min: 0, max: 1 },

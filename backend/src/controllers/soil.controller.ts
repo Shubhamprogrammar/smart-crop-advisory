@@ -48,3 +48,15 @@ export async function getReportById(req: Request, res: Response) {
   const report = await soilService.getReportById(req.params.reportId, req.user!.id);
   return sendSuccess(res, { message: "Soil report fetched", data: { report: sanitizeSoilReport(report) } });
 }
+
+export async function getReportImage(req: Request, res: Response) {
+  const { buffer, contentType } = await soilService.getReportImageForUser(
+    req.params.reportId,
+    req.user!.id,
+    req.user!.role
+  );
+  res.set("Content-Type", contentType);
+  res.set("Cache-Control", "private, max-age=300");
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.send(buffer);
+}

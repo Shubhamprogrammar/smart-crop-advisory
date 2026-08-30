@@ -9,7 +9,11 @@ export const createKnowledgeDocumentSchema = z.object({
   language: z.enum(LANGUAGES).default("en"),
   sourceType: z.enum(["pdf", "manual", "url"]).default("manual"),
   sourceUrl: z.string().trim().url().optional(),
-  text: z.string().trim().min(50, "Provide at least 50 characters of content to ingest"),
+  text: z
+    .string()
+    .trim()
+    .min(50, "Provide at least 50 characters of content to ingest")
+    .max(50000, "Content must be 50,000 characters or fewer — split longer documents into multiple entries"),
 });
 
 export type CreateKnowledgeDocumentInput = z.infer<typeof createKnowledgeDocumentSchema>;

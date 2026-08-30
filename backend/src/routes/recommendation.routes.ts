@@ -3,6 +3,7 @@ import * as recommendationController from "../controllers/recommendation.control
 import { requireAuth } from "../middlewares/auth.middleware";
 import { requireRole } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validate";
+import { aiLimiter } from "../middlewares/rateLimiter";
 import { catchAsync } from "../utils/catchAsync";
 import {
   cropRecommendationSchema,
@@ -17,6 +18,7 @@ router.use(requireRole("farmer"));
 
 router.post(
   "/crop/:farmId",
+  aiLimiter,
   validate(farmIdParamSchema, "params"),
   validate(cropRecommendationSchema),
   catchAsync(recommendationController.generateCropRecommendation)

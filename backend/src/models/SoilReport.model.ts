@@ -4,7 +4,8 @@ export interface ISoilReport extends Document {
   _id: Types.ObjectId;
   farm: Types.ObjectId;
   source: "manual" | "upload_ocr";
-  reportImageUrl?: string;
+  reportImagePublicId?: string;
+  reportImageFormat?: string;
   nitrogen?: number;
   phosphorus?: number;
   potassium?: number;
@@ -24,7 +25,11 @@ const soilReportSchema = new Schema<ISoilReport>(
   {
     farm: { type: Schema.Types.ObjectId, ref: "Farm", required: true, index: true },
     source: { type: String, enum: ["manual", "upload_ocr"], required: true },
-    reportImageUrl: { type: String },
+    // See DiseaseDetection.model.ts's imagePublicId comment — same
+    // private-storage + proxied-access pattern, via
+    // GET /api/soil/report/:reportId/image.
+    reportImagePublicId: { type: String },
+    reportImageFormat: { type: String },
     nitrogen: { type: Number, min: 0 },
     phosphorus: { type: Number, min: 0 },
     potassium: { type: Number, min: 0 },

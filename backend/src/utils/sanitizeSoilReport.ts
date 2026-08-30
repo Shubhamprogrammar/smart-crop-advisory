@@ -5,7 +5,7 @@ export function sanitizeSoilReport(report: ISoilReport) {
     id: report._id.toString(),
     farm: report.farm.toString(),
     source: report.source,
-    reportImageUrl: report.reportImageUrl,
+    reportImageUrl: report.reportImagePublicId ? `/api/soil/report/${report._id.toString()}/image` : undefined,
     nitrogen: report.nitrogen,
     phosphorus: report.phosphorus,
     potassium: report.potassium,

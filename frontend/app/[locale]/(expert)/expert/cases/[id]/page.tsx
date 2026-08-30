@@ -10,6 +10,7 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Badge, priorityTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 function riskTone(level?: string): "success" | "warning" | "danger" | "neutral" {
   if (level === "high") return "danger";
@@ -151,10 +152,10 @@ export default function ExpertCaseDetailPage() {
       {diseaseDetection && (
         <Card>
           <CardTitle>{t("aiDiagnosis")}</CardTitle>
-          <img
+          <AuthenticatedImage
             src={diseaseDetection.imageUrl}
             alt={diseaseDetection.predictedDisease ?? diseaseDetection.cropType}
-            className="mt-2 w-full rounded-card object-cover"
+            className="mt-2 h-64 w-full rounded-card object-cover"
           />
           <div className="mt-3 flex items-center gap-2">
             <p className="font-medium text-foreground">{diseaseDetection.predictedDisease ?? t("noDiagnosis")}</p>
