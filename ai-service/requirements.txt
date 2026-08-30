@@ -22,6 +22,9 @@ pandas==2.3.3
 numpy==2.3.3
 joblib==1.5.2
 
+# Phase 11 — AI farmer assistant (Hugging Face hosted LLM via Inference Providers)
+huggingface_hub==0.36.0
+
 # Phase 8 — Disease detection (Hugging Face computer vision model)
 # NOTE: this pulls the standard PyPI torch wheel (~500MB, includes CUDA
 # libs) because PyTorch's CPU-only wheel index (download.pytorch.org/whl/cpu)

@@ -9,6 +9,7 @@ import cropRoutes from "./crop.routes";
 import calendarRoutes from "./calendar.routes";
 import diseaseRoutes from "./disease.routes";
 import advisoryRoutes from "./advisory.routes";
+import chatRoutes from "./chat.routes";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use("/crops", cropRoutes);
 router.use("/calendar", calendarRoutes);
 router.use("/diseases", diseaseRoutes);
 router.use("/advisories", advisoryRoutes);
+router.use("/chat", chatRoutes);
 
 // Additional feature routers are mounted here as each phase is built.
 

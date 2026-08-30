@@ -49,3 +49,6 @@ coverage/
 # Misc
 *.tsbuildinfo
 .turbo/
+
+# Claude Code session artifacts
+.claude/

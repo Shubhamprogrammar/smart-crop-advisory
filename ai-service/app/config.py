@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5000,http://localhost:3000"
 
     hf_api_token: str | None = None
+    chat_model_id: str = "Qwen/Qwen2.5-7B-Instruct"
     mongo_uri: str | None = None
     qdrant_url: str | None = None
     model_path: str = "./app/ml/artifacts"

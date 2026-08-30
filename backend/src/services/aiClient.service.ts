@@ -158,3 +158,31 @@ export async function requestDiseaseRisk(
     return handleAiError(err, "disease-risk");
   }
 }
+
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatRequest {
+  question: string;
+  language: string;
+  context: string;
+  history: ChatHistoryMessage[];
+}
+
+export interface ChatResponse {
+  answer: string;
+  modelVersion: string;
+}
+
+export async function requestChatReply(input: ChatRequest): Promise<AiResult<ChatResponse>> {
+  try {
+    // Slightly longer than the AI service's own 45s LLM timeout, so the
+    // Python side has a chance to return a clean error before Node gives up.
+    const { data } = await aiClient.post<ChatResponse>("/ai/chat", input, { timeout: 50000 });
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "chat");
+  }
+}
