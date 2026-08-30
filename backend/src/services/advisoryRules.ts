@@ -23,6 +23,7 @@ import { IDiseaseRisk } from "../models/DiseaseRisk.model";
 import { IDiseaseDetection } from "../models/DiseaseDetection.model";
 import { WeatherResult } from "./weather.service";
 import { NotificationType, PriorityLevel } from "../constants/enums";
+import { computeIrrigationRecommendation } from "../utils/irrigationEngine";
 
 export interface AdvisoryContext {
   farm: IFarm;
@@ -145,29 +146,33 @@ export function soilHealthRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
   };
 }
 
-// --- Irrigation rule (light-touch; full smart irrigation is Phase 15) ----
-
-const LOW_MOISTURE_PCT = 20;
-const LOW_RAIN_PROBABILITY = 30;
+// --- Irrigation rule (consumes Phase 15's dedicated engine, doesn't
+// duplicate its logic) ----------------------------------------------------
 
 export function irrigationNeedRule(ctx: AdvisoryContext): AdvisoryCandidate | null {
-  const soil = ctx.soilReport;
   const weather = ctx.weather?.snapshot;
-  if (!soil || soil.moisture === undefined || soil.moisture >= LOW_MOISTURE_PCT || !weather) return null;
+  if (!ctx.cycle || !weather) return null;
 
-  const rainComing =
-    weather.current.rainProbability >= LOW_RAIN_PROBABILITY ||
-    (weather.forecast[1]?.rainProbability ?? 0) >= LOW_RAIN_PROBABILITY;
-  if (rainComing) return null;
+  const rec = computeIrrigationRecommendation({
+    cropStage: ctx.cycle.currentStage,
+    temperature: weather.current.temperature,
+    humidity: weather.current.humidity,
+    rainProbability: weather.current.rainProbability,
+    soilMoisturePercent: ctx.soilReport?.moisture,
+  });
+
+  if (!rec.irrigationRequired) return null;
 
   return {
     type: "irrigation",
-    priority: "medium",
-    title: "Irrigation recommended soon",
-    reason: `Soil moisture is low (${soil.moisture}%) and no significant rain is expected soon.`,
-    action: "Irrigate the crop soon to avoid water stress.",
-    deadline: inDays(2),
-    sourceData: { moisture: soil.moisture, rainProbability: weather.current.rainProbability },
+    priority: rec.urgency === "high" ? "high" : "medium",
+    title: "Irrigation recommended",
+    reason: rec.reason,
+    action: rec.recommendedAmount
+      ? `Apply a ${rec.recommendedAmount} irrigation; re-check in about ${rec.recommendedFrequencyDays} day(s).`
+      : "Irrigate soon.",
+    deadline: inDays(rec.recommendedFrequencyDays ?? 2),
+    sourceData: { urgency: rec.urgency, moistureDataAvailable: rec.moistureDataAvailable },
   };
 }
 

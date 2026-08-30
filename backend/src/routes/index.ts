@@ -13,6 +13,7 @@ import chatRoutes from "./chat.routes";
 import knowledgeRoutes from "./knowledge.routes";
 import profitRoutes from "./profit.routes";
 import marketRoutes from "./market.routes";
+import irrigationRoutes from "./irrigation.routes";
 
 const router = Router();
 
@@ -30,6 +31,7 @@ router.use("/chat", chatRoutes);
 router.use("/knowledge", knowledgeRoutes);
 router.use("/profit", profitRoutes);
 router.use("/market", marketRoutes);
+router.use("/irrigation", irrigationRoutes);
 
 // Additional feature routers are mounted here as each phase is built.
 
