@@ -14,6 +14,7 @@ import knowledgeRoutes from "./knowledge.routes";
 import profitRoutes from "./profit.routes";
 import marketRoutes from "./market.routes";
 import irrigationRoutes from "./irrigation.routes";
+import notificationRoutes from "./notification.routes";
 
 const router = Router();
 
@@ -32,6 +33,7 @@ router.use("/knowledge", knowledgeRoutes);
 router.use("/profit", profitRoutes);
 router.use("/market", marketRoutes);
 router.use("/irrigation", irrigationRoutes);
+router.use("/notifications", notificationRoutes);
 
 // Additional feature routers are mounted here as each phase is built.
 

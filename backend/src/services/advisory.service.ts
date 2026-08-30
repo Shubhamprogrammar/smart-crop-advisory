@@ -8,6 +8,7 @@ import { getLatestByFarm } from "./soil.service";
 import { getWeatherForFarm, WeatherResult } from "./weather.service";
 import { getLatestRisk } from "./diseaseRisk.service";
 import { AdvisoryContext, runAllRules } from "./advisoryRules";
+import { createNotification } from "./notification.service";
 
 const RECENT_DETECTION_WINDOW_DAYS = 7;
 const DEDUPE_WINDOW_HOURS = 24;
@@ -74,6 +75,19 @@ export async function generateAdvisories(farmId: string, ownerId: string): Promi
       sourceData: candidate.sourceData,
     });
     results.push(created);
+
+    // Notify on genuinely new, actionable advisories only -- "low"
+    // priority is intentionally excluded here to avoid notification
+    // fatigue (the advisory feed itself still shows everything).
+    if (candidate.priority === "high" || candidate.priority === "medium") {
+      await createNotification({
+        userId: ownerId,
+        type: candidate.type,
+        title: candidate.title,
+        message: candidate.action,
+        relatedAdvisory: created._id.toString(),
+      });
+    }
   }
 
   return results;
