@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     if (status === "unauthenticated") {
       router.replace("/login");
     } else if (status === "authenticated" && user && user.role !== "admin") {
-      router.replace("/dashboard");
+      router.replace(user.role === "expert" ? "/expert" : "/dashboard");
     }
   }, [status, user, router]);
 

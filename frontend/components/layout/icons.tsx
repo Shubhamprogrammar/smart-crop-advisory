@@ -49,6 +49,15 @@ export function ProfileIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function CaseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M9 3a2 2 0 0 0-2 2v1H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-3V5a2 2 0 0 0-2-2H9Zm0 3V5h6v1H9Z" />
+      <path d="M7 12h10v2H7z" opacity={0.55} />
+    </Base>
+  );
+}
+
 export function BellIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>

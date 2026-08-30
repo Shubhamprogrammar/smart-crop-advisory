@@ -4,26 +4,26 @@ import { ReactNode, useEffect } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useCurrentUser } from "@/lib/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
-import { Header } from "@/components/layout/Header";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { ExpertHeader } from "@/components/layout/ExpertHeader";
+import { ExpertNav } from "@/components/layout/ExpertNav";
 import { Spinner } from "@/components/ui/Spinner";
 
-export default function FarmerLayout({ children }: { children: ReactNode }) {
+export default function ExpertLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   useCurrentUser();
   const status = useAuthStore((s) => s.status);
-
   const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
-    } else if (status === "authenticated" && user && user.role !== "farmer") {
-      router.replace(user.role === "admin" ? "/admin" : "/expert");
+    } else if (status === "authenticated" && user) {
+      if (user.role === "admin") router.replace("/admin");
+      else if (user.role === "farmer") router.replace("/dashboard");
     }
   }, [status, user, router]);
 
-  if (status === "idle" || status === "loading" || (status === "authenticated" && user?.role !== "farmer")) {
+  if (status === "idle" || status === "loading" || (status === "authenticated" && user?.role !== "expert")) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Spinner className="text-primary" />
@@ -37,9 +37,9 @@ export default function FarmerLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <Header />
+      <ExpertHeader />
       <div className="mx-auto w-full max-w-md flex-1 px-4 py-4">{children}</div>
-      <BottomNav />
+      <ExpertNav />
     </div>
   );
 }
