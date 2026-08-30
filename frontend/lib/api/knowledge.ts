@@ -21,7 +21,7 @@ export interface KnowledgeDocument {
   sourceUrl?: string;
   language: "en" | "hi" | "mr" | "gu";
   chunkCount?: number;
-  status: "pending" | "ready" | "failed";
+  status: "pending" | "processing" | "ready" | "failed";
   createdAt: string;
 }
 

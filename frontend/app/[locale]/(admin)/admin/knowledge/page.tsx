@@ -31,6 +31,11 @@ export default function AdminKnowledgePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "knowledge"],
     queryFn: () => knowledgeApi.listDocuments(),
+    refetchInterval: (query) => {
+      const docs = query.state.data?.documents ?? [];
+      const stillWorking = docs.some((d) => d.status === "pending" || d.status === "processing");
+      return stillWorking ? 3000 : false;
+    },
   });
 
   const createMutation = useMutation({

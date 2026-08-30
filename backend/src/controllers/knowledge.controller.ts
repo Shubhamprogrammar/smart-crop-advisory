@@ -8,7 +8,7 @@ export async function createDocument(req: Request, res: Response) {
   const input = req.body as CreateKnowledgeDocumentInput;
   const doc = await knowledgeService.createDocument(req.user!.id, input);
   return sendSuccess(res, {
-    message: doc.status === "ready" ? "Document ingested" : "Document created but ingestion failed",
+    message: "Document queued for ingestion",
     data: { document: sanitizeKnowledgeDocument(doc) },
     statusCode: 201,
   });

@@ -13,7 +13,7 @@ import { getById as getDetectionById } from "./disease.service";
 import { getActiveCycle } from "./cropCycle.service";
 import { getLatestByFarm } from "./soil.service";
 import { getWeatherForFarm, WeatherResult } from "./weather.service";
-import { createNotification } from "./notification.service";
+import { enqueueNotification } from "../queues";
 import { logger } from "../utils/logger";
 import { CreateCaseInput, ListCasesQuery, AddResponseInput } from "../validators/expert.validator";
 
@@ -189,7 +189,7 @@ export async function addResponse(
     });
   }
 
-  await createNotification({
+  await enqueueNotification({
     userId: expertCase.farmer.toString(),
     type: "general",
     title: "An expert responded to your case",
@@ -215,7 +215,7 @@ export async function updateCaseStatus(
   await expertCase.save();
 
   if (status === "resolved") {
-    await createNotification({
+    await enqueueNotification({
       userId: expertCase.farmer.toString(),
       type: "general",
       title: "Your case has been resolved",

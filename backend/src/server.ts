@@ -3,6 +3,7 @@ import { env } from "./config/env";
 import { logger } from "./utils/logger";
 import { connectDB, disconnectDB } from "./config/db";
 import { connectRedis, redis } from "./config/redis";
+import { queueConnection } from "./config/queueConnection";
 import { Server } from "http";
 
 let server: Server;
@@ -21,6 +22,7 @@ async function shutdown(signal: string) {
   server?.close(async () => {
     await disconnectDB();
     redis.disconnect();
+    queueConnection.disconnect();
     logger.info("Server closed");
     process.exit(0);
   });

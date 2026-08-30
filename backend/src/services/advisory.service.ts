@@ -9,7 +9,7 @@ import { getWeatherForFarm, WeatherResult } from "./weather.service";
 import { getLatestRisk } from "./diseaseRisk.service";
 import { AdvisoryContext, runAllRules } from "./advisoryRules";
 import { getRuleThresholds } from "./advisoryRuleConfig.service";
-import { createNotification } from "./notification.service";
+import { enqueueNotification } from "../queues";
 
 const RECENT_DETECTION_WINDOW_DAYS = 7;
 const DEDUPE_WINDOW_HOURS = 24;
@@ -82,7 +82,7 @@ export async function generateAdvisories(farmId: string, ownerId: string): Promi
     // priority is intentionally excluded here to avoid notification
     // fatigue (the advisory feed itself still shows everything).
     if (candidate.priority === "high" || candidate.priority === "medium") {
-      await createNotification({
+      await enqueueNotification({
         userId: ownerId,
         type: candidate.type,
         title: candidate.title,
