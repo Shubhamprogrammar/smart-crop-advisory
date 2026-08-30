@@ -10,6 +10,18 @@ const aiClient = axios.create({
 
 export type AiResult<T> = { ok: true; data: T } | { ok: false; status?: number; reason: string };
 
+function handleAiError(err: unknown, context: string): { ok: false; status?: number; reason: string } {
+  if (axios.isAxiosError(err)) {
+    const status = err.response?.status;
+    const detail = (err.response?.data as { detail?: string } | undefined)?.detail;
+    logger.warn(`AI service ${context} call failed`, { status, detail: detail ?? err.message });
+    return { ok: false, status, reason: detail ?? "AI service unavailable" };
+  }
+
+  logger.error(`Unexpected error calling AI service (${context})`, { err });
+  return { ok: false, reason: "AI service unavailable" };
+}
+
 export interface SoilOcrExtracted {
   nitrogen: number | null;
   phosphorus: number | null;
@@ -41,14 +53,44 @@ export async function requestSoilOcr(
 
     return { ok: true, data };
   } catch (err) {
-    if (axios.isAxiosError(err)) {
-      const status = err.response?.status;
-      const detail = (err.response?.data as { detail?: string } | undefined)?.detail;
-      logger.warn("AI service soil-ocr call failed", { status, detail: detail ?? err.message });
-      return { ok: false, status, reason: detail ?? "AI service unavailable" };
-    }
+    return handleAiError(err, "soil-ocr");
+  }
+}
 
-    logger.error("Unexpected error calling AI service", { err });
-    return { ok: false, reason: "AI service unavailable" };
+export interface CropRecommendationRequest {
+  nitrogen: number;
+  phosphorus: number;
+  potassium: number;
+  temperature: number;
+  humidity: number;
+  ph: number;
+  rainfall: number;
+}
+
+export interface CropPrediction {
+  crop: string;
+  suitabilityScore: number;
+  explanation: string;
+  benefits: string[];
+  risks: string[];
+}
+
+export interface CropRecommendationResponse {
+  recommendations: CropPrediction[];
+  modelVersion: string;
+  source: "ml_model";
+}
+
+export async function requestCropRecommendation(
+  input: CropRecommendationRequest
+): Promise<AiResult<CropRecommendationResponse>> {
+  try {
+    const { data } = await aiClient.post<CropRecommendationResponse>(
+      "/ai/crop-recommendation",
+      input
+    );
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "crop-recommendation");
   }
 }

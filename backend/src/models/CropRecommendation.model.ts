@@ -1,7 +1,7 @@
 import { Schema, model, Document, Types } from "mongoose";
 
 interface RecommendedCrop {
-  crop: Types.ObjectId;
+  crop?: Types.ObjectId;
   cropName: string;
   suitabilityScore: number;
   explanation: string;
@@ -34,7 +34,7 @@ export interface ICropRecommendation extends Document {
 
 const recommendedCropSchema = new Schema<RecommendedCrop>(
   {
-    crop: { type: Schema.Types.ObjectId, ref: "Crop", required: true },
+    crop: { type: Schema.Types.ObjectId, ref: "Crop" },
     cropName: { type: String, required: true },
     suitabilityScore: { type: Number, required: true, min: 0, max: 1 },
     explanation: { type: String, required: true },
