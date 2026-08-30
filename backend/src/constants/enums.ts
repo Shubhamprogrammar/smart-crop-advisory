@@ -45,15 +45,14 @@ export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 export const NOTIFICATION_CHANNELS = ["browser", "email", "sms", "whatsapp"] as const;
 export type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[number];
 
-// Initial supported crops for disease detection (per spec §H — realistic limited set).
-export const SUPPORTED_DISEASE_CROPS = [
-  "tomato",
-  "potato",
-  "rice",
-  "wheat",
-  "cotton",
-  "maize",
-] as const;
+// Initial supported crops for disease detection (per spec §H — realistic
+// limited set). The spec's suggested list is tomato/potato/rice/wheat/
+// cotton/maize, but the actual model in use (Phase 8, PlantVillage-trained)
+// only covers tomato/potato/maize — rice/wheat/cotton disease models were
+// not found as verified public checkpoints, so they're deliberately left
+// out here rather than pretending to support them (exactly per the spec's
+// own "realistic limited number of crops" instruction).
+export const SUPPORTED_DISEASE_CROPS = ["tomato", "potato", "maize"] as const;
 export type SupportedDiseaseCrop = (typeof SUPPORTED_DISEASE_CROPS)[number];
 
 export const SEASONS = ["kharif", "rabi", "zaid", "perennial"] as const;

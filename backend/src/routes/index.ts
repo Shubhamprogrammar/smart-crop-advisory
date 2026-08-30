@@ -7,6 +7,7 @@ import weatherRoutes from "./weather.routes";
 import recommendationRoutes from "./recommendation.routes";
 import cropRoutes from "./crop.routes";
 import calendarRoutes from "./calendar.routes";
+import diseaseRoutes from "./disease.routes";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use("/weather", weatherRoutes);
 router.use("/recommendations", recommendationRoutes);
 router.use("/crops", cropRoutes);
 router.use("/calendar", calendarRoutes);
+router.use("/diseases", diseaseRoutes);
 
 // Additional feature routers are mounted here as each phase is built.
 

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routes import crop_recommendation, health, soil_ocr
+from app.routes import crop_recommendation, disease_detection, health, soil_ocr
 
 settings = get_settings()
 
@@ -23,6 +23,6 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(soil_ocr.router)
 app.include_router(crop_recommendation.router)
+app.include_router(disease_detection.router)
 
-# Additional AI capability routers are included here as each phase is built, e.g.:
-# app.include_router(disease_detection.router, prefix="/ai/disease-detection")
+# Additional AI capability routers are included here as each phase is built.

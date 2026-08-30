@@ -21,3 +21,12 @@ scikit-learn==1.7.2
 pandas==2.3.3
 numpy==2.3.3
 joblib==1.5.2
+
+# Phase 8 — Disease detection (Hugging Face computer vision model)
+# NOTE: this pulls the standard PyPI torch wheel (~500MB, includes CUDA
+# libs) because PyTorch's CPU-only wheel index (download.pytorch.org/whl/cpu)
+# has not published cp314 builds yet. CPU inference works identically either
+# way. For a smaller production image on an older Python, install torch via:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch==2.13.0
+transformers==4.57.1

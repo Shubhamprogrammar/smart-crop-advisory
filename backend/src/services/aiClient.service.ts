@@ -94,3 +94,40 @@ export async function requestCropRecommendation(
     return handleAiError(err, "crop-recommendation");
   }
 }
+
+export interface DiseaseDetectionResponse {
+  status: "identified" | "unsupported_crop" | "low_confidence";
+  detectedLabel: string;
+  confidence: number;
+  cropType: string | null;
+  diseaseName: string | null;
+  isHealthy: boolean | null;
+  symptoms: string[];
+  possibleCauses: string[];
+  prevention: string[];
+  treatment: string[];
+  recommendedAction: string;
+  modelVersion: string;
+}
+
+export async function requestDiseaseDetection(
+  buffer: Buffer,
+  filename: string,
+  mimetype: string
+): Promise<AiResult<DiseaseDetectionResponse>> {
+  try {
+    const form = new FormData();
+    form.append("image", buffer, { filename, contentType: mimetype });
+
+    const { data } = await aiClient.post<DiseaseDetectionResponse>("/ai/disease-detection", form, {
+      headers: form.getHeaders(),
+      // First-request model load + CPU inference can take longer than the
+      // default timeout.
+      timeout: 30000,
+    });
+
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "disease-detection");
+  }
+}
