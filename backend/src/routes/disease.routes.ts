@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as diseaseController from "../controllers/disease.controller";
+import * as diseaseRiskController from "../controllers/diseaseRisk.controller";
 import { requireAuth } from "../middlewares/auth.middleware";
 import { requireRole } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validate";
@@ -34,6 +35,24 @@ router.get(
   "/detection/:id",
   validate(detectionIdParamSchema, "params"),
   catchAsync(diseaseController.getDetection)
+);
+
+router.post(
+  "/risk/:farmId",
+  validate(farmIdParamSchema, "params"),
+  catchAsync(diseaseRiskController.computeRisk)
+);
+
+router.get(
+  "/risk/:farmId/latest",
+  validate(farmIdParamSchema, "params"),
+  catchAsync(diseaseRiskController.getLatestRisk)
+);
+
+router.get(
+  "/risk/:farmId/history",
+  validate(farmIdParamSchema, "params"),
+  catchAsync(diseaseRiskController.listRiskHistory)
 );
 
 export default router;

@@ -131,3 +131,30 @@ export async function requestDiseaseDetection(
     return handleAiError(err, "disease-detection");
   }
 }
+
+export interface DiseaseRiskRequest {
+  cropStage: string;
+  temperature: number;
+  humidity: number;
+  rainfall: number;
+  rainProbability: number;
+  recentDiseaseDetected: boolean;
+}
+
+export interface DiseaseRiskResponse {
+  riskLevel: "low" | "medium" | "high";
+  reason: string;
+  preventiveAction: string;
+  modelVersion: string;
+}
+
+export async function requestDiseaseRisk(
+  input: DiseaseRiskRequest
+): Promise<AiResult<DiseaseRiskResponse>> {
+  try {
+    const { data } = await aiClient.post<DiseaseRiskResponse>("/ai/disease-risk", input);
+    return { ok: true, data };
+  } catch (err) {
+    return handleAiError(err, "disease-risk");
+  }
+}
