@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError";
 import { toGeoPoint } from "../utils/geo";
 import { CreateFarmInput, UpdateFarmInput } from "../validators/farm.validator";
 
-async function findOwnedFarmOrThrow(farmId: string, ownerId: string): Promise<IFarm> {
+export async function getOwnedFarmOrThrow(farmId: string, ownerId: string): Promise<IFarm> {
   const farm = await Farm.findById(farmId);
 
   if (!farm || farm.owner.toString() !== ownerId) {
@@ -30,7 +30,7 @@ export async function listMyFarms(ownerId: string): Promise<IFarm[]> {
 }
 
 export async function getFarm(farmId: string, ownerId: string): Promise<IFarm> {
-  return findOwnedFarmOrThrow(farmId, ownerId);
+  return getOwnedFarmOrThrow(farmId, ownerId);
 }
 
 export async function updateFarm(
@@ -38,7 +38,7 @@ export async function updateFarm(
   ownerId: string,
   input: UpdateFarmInput
 ): Promise<IFarm> {
-  const farm = await findOwnedFarmOrThrow(farmId, ownerId);
+  const farm = await getOwnedFarmOrThrow(farmId, ownerId);
 
   if (input.name !== undefined) farm.name = input.name;
   if (input.landAreaAcres !== undefined) farm.landAreaAcres = input.landAreaAcres;
@@ -53,6 +53,6 @@ export async function updateFarm(
 }
 
 export async function deleteFarm(farmId: string, ownerId: string): Promise<void> {
-  const farm = await findOwnedFarmOrThrow(farmId, ownerId);
+  const farm = await getOwnedFarmOrThrow(farmId, ownerId);
   await farm.deleteOne();
 }

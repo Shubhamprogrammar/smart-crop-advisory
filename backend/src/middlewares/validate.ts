@@ -9,7 +9,9 @@ export function validate(schema: ZodType, part: RequestPart = "body") {
     const result = schema.safeParse(req[part]);
 
     if (!result.success) {
-      next(ApiError.badRequest("Validation failed", result.error.flatten().fieldErrors));
+      const { fieldErrors, formErrors } = result.error.flatten();
+      const details = formErrors.length > 0 ? { ...fieldErrors, _form: formErrors } : fieldErrors;
+      next(ApiError.badRequest("Validation failed", details));
       return;
     }
 

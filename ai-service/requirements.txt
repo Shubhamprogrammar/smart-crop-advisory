@@ -10,3 +10,8 @@ pydantic==2.13.5
 pydantic-settings==2.12.0
 python-dotenv==1.1.1
 python-multipart==0.0.20
+
+# Phase 4 — Soil OCR (requires the `tesseract` system binary; the endpoint
+# degrades gracefully with a clear error if it is not installed)
+pytesseract==0.3.13
+pillow==12.3.0

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { MulterError } from "multer";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../utils/logger";
 import { sendError } from "../utils/apiResponse";
@@ -9,6 +10,10 @@ export function notFoundHandler(req: Request, _res: Response, next: NextFunction
 }
 
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+  if (err instanceof MulterError) {
+    return sendError(res, { message: err.message, statusCode: 400 });
+  }
+
   if (err instanceof ApiError) {
     if (err.statusCode >= 500) {
       logger.error(err.message, { stack: err.stack, details: err.details });
