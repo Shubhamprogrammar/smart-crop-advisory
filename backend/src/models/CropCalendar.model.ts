@@ -1,25 +1,17 @@
 import { Schema, model, Document, Types } from "mongoose";
-import { CROP_STAGES, CropStage } from "../constants/enums";
+import { CROP_STAGES, CropStage, CALENDAR_TASK_TYPES, CalendarTaskType } from "../constants/enums";
 
-const TASK_TYPES = [
-  "fertilizer",
-  "irrigation",
-  "pest_monitoring",
-  "disease_monitoring",
-  "harvest",
-  "general",
-] as const;
-
-interface CalendarTask {
+export interface CalendarTask {
+  _id: Types.ObjectId;
   title: string;
   description?: string;
-  type: (typeof TASK_TYPES)[number];
+  type: CalendarTaskType;
   dueDate?: Date;
   status: "pending" | "done" | "skipped";
   completedAt?: Date;
 }
 
-interface CalendarStage {
+export interface CalendarStage {
   name: CropStage;
   startDate?: Date;
   endDate?: Date;
@@ -37,17 +29,14 @@ export interface ICropCalendar extends Document {
   updatedAt: Date;
 }
 
-const calendarTaskSchema = new Schema<CalendarTask>(
-  {
-    title: { type: String, required: true },
-    description: { type: String },
-    type: { type: String, enum: TASK_TYPES, required: true },
-    dueDate: { type: Date },
-    status: { type: String, enum: ["pending", "done", "skipped"], default: "pending" },
-    completedAt: { type: Date },
-  },
-  { _id: false }
-);
+const calendarTaskSchema = new Schema<CalendarTask>({
+  title: { type: String, required: true },
+  description: { type: String },
+  type: { type: String, enum: CALENDAR_TASK_TYPES, required: true },
+  dueDate: { type: Date },
+  status: { type: String, enum: ["pending", "done", "skipped"], default: "pending" },
+  completedAt: { type: Date },
+});
 
 const calendarStageSchema = new Schema<CalendarStage>(
   {

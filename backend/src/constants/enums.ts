@@ -61,3 +61,13 @@ export type Season = (typeof SEASONS)[number];
 
 export const DATA_SOURCE = ["real_data", "ai_prediction"] as const;
 export type DataSource = (typeof DATA_SOURCE)[number];
+
+export const CALENDAR_TASK_TYPES = [
+  "fertilizer",
+  "irrigation",
+  "pest_monitoring",
+  "disease_monitoring",
+  "harvest",
+  "general",
+] as const;
+export type CalendarTaskType = (typeof CALENDAR_TASK_TYPES)[number];
