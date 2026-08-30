@@ -1,4 +1,5 @@
 import { IUser } from "../models/User.model";
+import { fromGeoPoint } from "./geo";
 
 export function sanitizeUser(user: IUser) {
   return {
@@ -8,7 +9,7 @@ export function sanitizeUser(user: IUser) {
     phone: user.phone,
     role: user.role,
     preferredLanguage: user.preferredLanguage,
-    location: user.location,
+    location: fromGeoPoint(user.location),
     farmingExperienceYears: user.farmingExperienceYears,
     avatarUrl: user.avatarUrl,
     isActive: user.isActive,
