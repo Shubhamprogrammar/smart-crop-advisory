@@ -31,7 +31,7 @@ export default function RegisterPage() {
       }),
     onSuccess: ({ user }) => {
       setUser(user);
-      router.push("/farms/new");
+      router.push("/dashboard");
     },
   });
 

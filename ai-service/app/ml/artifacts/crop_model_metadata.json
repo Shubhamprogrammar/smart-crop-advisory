@@ -34,7 +34,7 @@
     "rice",
     "watermelon"
   ],
-  "trainedAt": "2026-08-30T13:08:33.570175+00:00",
+  "trainedAt": "2026-08-31T11:25:05.594841+00:00",
   "datasetRows": 2200,
   "testAccuracy": 0.9955,
   "testSetSize": 440,

@@ -154,10 +154,20 @@ def get_reply(
         knowledge_context=_format_knowledge_context(retrieved),
     )
 
-    messages = [{"role": "system", "content": system_prompt}]
+    # Gemma's chat template has no "system" turn -- providers behind HF's
+    # router reject a separate system-role message for it outright, so fold
+    # the system prompt into the first user turn instead for these models.
+    supports_system_role = not model_id.startswith("google/gemma")
+
+    messages = []
+    if supports_system_role:
+        messages.append({"role": "system", "content": system_prompt})
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})
-    messages.append({"role": "user", "content": question})
+    if supports_system_role:
+        messages.append({"role": "user", "content": question})
+    else:
+        messages.append({"role": "user", "content": f"{system_prompt}\n\n{question}"})
 
     try:
         completion = client.chat.completions.create(

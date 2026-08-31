@@ -37,6 +37,6 @@ transformers==4.57.1
 # Phase 12 — RAG (embeddings run locally, not via the quota-limited HF
 # Inference Providers API — sentence-transformers reuses the torch install
 # above)
-sentence-transformers==6.0.0
+sentence-transformers==3.4.1
 qdrant-client==1.19.0
 pypdf==6.16.2

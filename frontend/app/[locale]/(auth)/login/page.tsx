@@ -23,7 +23,7 @@ export default function LoginPage() {
     mutationFn: () => authApi.login({ identifier, password }),
     onSuccess: ({ user }) => {
       setUser(user);
-      router.push(user.role === "admin" ? "/admin" : user.role === "expert" ? "/expert" : "/dashboard");
+      router.push(user.role === "expert" ? "/expert" : "/dashboard");
     },
   });
 
